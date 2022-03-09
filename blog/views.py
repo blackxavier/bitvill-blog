@@ -1,7 +1,9 @@
 from django.shortcuts import render, get_object_or_404
 from django.core.paginator import PageNotAnInteger, Paginator, EmptyPage
 from django.views.generic import ListView
+from blog.forms import PostSendMailForm
 from blog.models import Post
+from blog.utils import post_share_mail
 
 
 class PostListView(ListView):
@@ -35,3 +37,18 @@ def post_detail(request, post):
     post = get_object_or_404(Post, slug=post, status="published")
     context = {"post": post}
     return render(request, "blog/post/post_detail.html", context)
+
+
+def post_share(request, post_id):
+    post = get_object_or_404(Post, id=post_id, status="published")
+    sent = False
+    if request.method == "POST":
+        form = PostSendMailForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            post_share_mail(request, post, cd)
+            sent = True
+    else:
+        form = PostSendMailForm()
+    context = {"form": form, "post": post, "sent": sent}
+    return render(request, "blog/post/share.html", context)
