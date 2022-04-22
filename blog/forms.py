@@ -12,9 +12,9 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ("email", "body")
-    def save(self,post,*args, **kwargs):
-        
+
+    def save(self, post, *args, **kwargs):
+
         super(CommentForm, self).save(*args, **kwargs)
         self.post = post
         return self.instance
-        
