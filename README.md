@@ -1,2 +1,4 @@
+
 # Bitvill-blog
-Blog application built with django and django rest framework
+
+Blog application built with django
