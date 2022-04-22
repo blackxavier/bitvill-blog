@@ -6,6 +6,7 @@ from taggit.models import Tag
 from blog.forms import PostSendMailForm, CommentForm
 from blog.models import Post, Comment
 from blog.utils import post_share_mail
+from django.db import transaction
 
 
 # class PostListView(ListView):
@@ -88,6 +89,7 @@ def post_detail(request, post):
     return render(request, "blog/post/post_detail.html", context)
 
 
+@transaction.atomic()
 def post_share(request, post_slug):
     post = get_object_or_404(Post, slug=post_slug, status="published")
     sent = False
