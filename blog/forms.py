@@ -18,3 +18,5 @@ class CommentForm(forms.ModelForm):
         super(CommentForm, self).save(*args, **kwargs)
         self.post = post
         return self.instance
+class SearchForm(forms.Form):
+    query = forms.CharField()

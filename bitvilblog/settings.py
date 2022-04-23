@@ -26,8 +26,11 @@ EMAIL_USE_TLS = env("EMAIL_USE_TLS")
 # Application definition
 
 INSTALLED_APPS = [
+    "django.contrib.sites",
+    "django.contrib.sitemaps",
     "django.contrib.admin",
     "django.contrib.auth",
+    "django.contrib.postgres",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
@@ -36,7 +39,7 @@ INSTALLED_APPS = [
     "blog.apps.BlogConfig",
     "taggit",
 ]
-
+SITE_ID = 1
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -73,8 +76,10 @@ WSGI_APPLICATION = "bitvilblog.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env("db_name"),
+        "USER": env("db_user"),
+        "PASSWORD": env("db_password"),
     }
 }
 

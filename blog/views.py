@@ -3,11 +3,11 @@ from django.core.paginator import PageNotAnInteger, Paginator, EmptyPage
 from django.views.generic import ListView
 from django.db.models import Count
 from taggit.models import Tag
-from blog.forms import PostSendMailForm, CommentForm
+from blog.forms import PostSendMailForm, CommentForm, SearchForm
 from blog.models import Post, Comment
 from blog.utils import post_share_mail
 from django.db import transaction
-
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 
 # class PostListView(ListView):
 #     queryset = Post.published.all()
@@ -103,3 +103,31 @@ def post_share(request, post_slug):
         form = PostSendMailForm()
     context = {"form": form, "post": post, "sent": sent}
     return render(request, "blog/post/share.html", context)
+
+
+def post_search(request):
+    form = SearchForm()
+    query = None
+    results = []
+    if "query" in request.GET:
+        form = SearchForm(request.GET)
+        if form.is_valid():
+            query = form.cleaned_data["query"]
+            search_vector = (
+                SearchVector("title", weight="A")
+                + SearchVector("body", weight="B")
+                + SearchVector("tags", weight="B")
+            )
+            search_query = SearchQuery(query)
+            results = (
+                Post.published.annotate(
+                    search=search_vector, rank=SearchRank(search_vector, search_query)
+                )
+                .filter(rank__gte=0.3)
+                .order_by("-rank")
+            )
+    return render(
+        request,
+        "blog/post/search.html",
+        {"form": form, "query": query, "results": results},
+    )
